@@ -3,5 +3,6 @@ dist
 models/*
 renders/*.png
 renders/steps/*.png
+taming
 simple_vqgan/__pycache__
 simple_vqgan.egg-info
