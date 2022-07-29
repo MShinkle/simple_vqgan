@@ -317,6 +317,8 @@ def generate(
     t = trange(iterations)
     for i in t:
         if i == iterations-1:
+            if not os.path.exists(f"{os.curdir}/renders"):
+                os.makedirs(f"{os.curdir}/renders")
             fname=f"{os.curdir}/renders/{save_name}"
         elif save_steps and (i % save_every == 0):
             steps_dir = f"{os.curdir}/renders/steps"
