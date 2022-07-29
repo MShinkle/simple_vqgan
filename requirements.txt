@@ -1,0 +1,11 @@
+numpy
+omegaconf
+torch
+torchvision
+tqdm
+pytorch_lightning
+einops
+CLIP
+taming-transformers
+imageio
+kornia

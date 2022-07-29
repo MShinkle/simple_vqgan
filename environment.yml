@@ -1,0 +1,5 @@
+name: simple_vqgan
+
+dependencies:
+  - python=3.9
+  - pytorch
