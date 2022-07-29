@@ -9,3 +9,4 @@ CLIP
 taming-transformers
 imageio
 kornia
+clip>=1.0

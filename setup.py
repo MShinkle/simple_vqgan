@@ -14,6 +14,7 @@ if os.path.isfile(requirement_path):
 setuptools.setup(
     name="simple_vqgan",
     install_requires=install_requires,
+    dependency_links = ['http://github.com/openai/CLIP/tarball/main#egg=clip-1.0'],
     version="0.0.1",
     author="Matthew Shinkle",
     author_email="mshinkle1040@gmail.com",
