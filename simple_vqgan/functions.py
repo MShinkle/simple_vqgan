@@ -4,6 +4,7 @@ import math
 import sys
 import numpy as np
 import os
+import requests
  
 sys.path.append('./taming-transformers')
 
@@ -226,7 +227,7 @@ def generate(
     text_prompts,
     width=250,
     height=250,
-    save_name='output.png',
+    save_name=None,
     iterations=100,
     save_every=10,
     save_steps=False,
@@ -243,11 +244,13 @@ def generate(
         text_prompts = [phrase.strip() for phrase in text_prompts.split("|")]
         if text_prompts == ['']:
             text_prompts = []
-        if image_prompts == "None" or not image_prompts:
-            image_prompts = []
+
+    if save_name is None:
+        if isinstance(text_prompts, (list, tuple)):
+            save_string = '__'.join(text_prompts)
         else:
-            image_prompts = image_prompts.split("|")
-            image_prompts = [image.strip() for image in image_prompts]
+            save_string = text_prompts
+        save_name = '_'.join(save_string.split(' ')) + '.png'
 
     width = int(width)
     height = int(height)
@@ -259,14 +262,21 @@ def generate(
     save_every = int(save_every)
 
     init_weight = 0
-    cutn=64,
-    cut_pow=1.,
+    cutn=64
+    cut_pow=1.
 
-    model="vqgan_imagenet_f16_16384",
-    clip_model='ViT-B/32',
+    model="vqgan_imagenet_f16_16384"
+    clip_model='ViT-B/32'
 
     vqgan_config=f'{os.curdir}/models/{os.curdir}/{model}.yaml'
+    if not os.path.exists(vqgan_config):
+        print("model .yaml not found, downloading...")
+        open(vqgan_config, "wb").write(requests.get('https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/files/?p=%2Fconfigs%2Fmodel.yaml&dl=1').content)
+
     vqgan_checkpoint=f'{os.curdir}/models/{os.curdir}/{model}.ckpt'
+    if not os.path.exists(vqgan_checkpoint):
+        print("model .ckpt not found, downloading...")
+        open(vqgan_checkpoint, "wb").write(requests.get('https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/files/?p=%2Fckpts%2Flast.ckpt&dl=1').content)
 
     print('Using device:', device)
     if seed is None:
@@ -275,7 +285,7 @@ def generate(
     print('Using seed', seed)
     
     model = load_vqgan_model(vqgan_config, vqgan_checkpoint).to(device)
-    perceptor = clip.load(clip_model, jit=False)[0].eval().requires_grad_(False).to(device).to(torch.float32)
+    perceptor = clip.load(clip_model, device=device, jit=False)[0].eval().requires_grad_(False).to(device).to(torch.float32)
     
     cut_size = perceptor.visual.input_resolution
     e_dim = model.quantize.e_dim
@@ -304,22 +314,16 @@ def generate(
         embed = perceptor.encode_text(clip.tokenize(txt).to(device)).float()
         pMs.append(Prompt(embed, weight, stop).to(device))
 
-    for prompt in image_prompts:
-        path, weight, stop = parse_prompt(prompt)
-        img = resize_image(Image.open(path).convert('RGB'), (sideX, sideY))
-        batch = make_cutouts(TF.to_tensor(img).unsqueeze(0).to(device))
-        embed = perceptor.encode_image(normalize(batch)).float()
-        pMs.append(Prompt(embed, weight, stop).to(device))
-
     t = trange(iterations)
     for i in t:
         if i == iterations-1:
-            fname=f"{os.curdir()}/renders/{save_name}"
+            fname=f"{os.curdir}/renders/{save_name}"
         elif save_steps and (i % save_every == 0):
-            steps_dir = f"{os.curdir()}/renders/steps"
+            steps_dir = f"{os.curdir}/renders/steps"
             if not os.path.exists(steps_dir):
                 os.makedirs(steps_dir)
             fname=f"{steps_dir}/{save_name}"
         else:
             fname=None
         train(t, opt, make_cutouts, z, z_orig, z_min, z_max, model, perceptor, init_weight, pMs, fname=fname)
+    print(f"Saving final image to {fname}")
