@@ -192,30 +192,20 @@ def resize_image(image, out_size):
     size = round((area * ratio)**0.5), round((area / ratio)**0.5)
     return image.resize(size, Image.LANCZOS)
 
-def synth(z, model):
+def train(pbar, opt, make_cutouts, z, z_orig, z_min, z_max, model, perceptor, init_weight, pMs, fname):
+    opt.zero_grad()
     z_q = vector_quantize(z.movedim(1, 3), model.quantize.embedding.weight).movedim(3, 1)
-    return clamp_with_grad(model.decode(z_q).add(1).div(2), 0, 1)
-
-def ascend_txt(make_cutouts, model, z, z_orig, perceptor, init_weight, pMs, fname):
-    out = synth(z, model)
+    out = clamp_with_grad(model.decode(z_q).add(1).div(2), 0, 1)
     iii = perceptor.encode_image(normalize(make_cutouts(out))).float()
-
-    result = []
-
+    lossAll = []
     if init_weight:
-        result.append(F.mse_loss(z, z_orig) * init_weight / 2)
-
+        lossAll.append(F.mse_loss(z, z_orig) * init_weight / 2)
     for prompt in pMs:
-        result.append(prompt(iii))
+        lossAll.append(prompt(iii))
     img = np.array(out.mul(255).clamp(0, 255)[0].cpu().detach().numpy().astype(np.uint8))[:,:,:]
     img = np.transpose(img, (1, 2, 0))
     if fname is not None:
         imageio.imwrite(fname, np.array(img))
-    return result
-
-def train(pbar, opt, make_cutouts, z, z_orig, z_min, z_max, model, perceptor, init_weight, pMs, fname):
-    opt.zero_grad()
-    lossAll = ascend_txt(make_cutouts, model, z, z_orig, perceptor, init_weight, pMs, fname)
     loss = sum(lossAll)
     pbar.set_postfix_str(f"loss={loss.item():05f}")
     loss.backward()
