@@ -25,6 +25,8 @@ A common error on fresh linux installs is missing gcc--this can be installed via
 
 `sudo apt install gcc`
 
+Then call `python setup.py install` again.
+
 Also note that if you intend to use CUDA, you may need to install a version of pytorch specific to your CUDA version.
 
 ##### CUDA 10.2
