@@ -19,16 +19,18 @@ Clone this repo, and then navigate into the cloned directory.  Then install with
 
 The package should now be installed!
 
+### Possible installation issues
+
 A common error on fresh linux installs is missing gcc--this can be installed via apt:
 
 `sudo apt install gcc`
 
 Also note that if you intend to use CUDA, you may need to install a version of pytorch specific to your CUDA version.
 
-# CUDA 10.2
+##### CUDA 10.2
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=10.2 -c pytorch
 
-# CUDA 11.3
+##### CUDA 11.3
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 
 CPU-only use *shouldn't* require special pytorch installation.
