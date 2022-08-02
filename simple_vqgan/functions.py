@@ -258,6 +258,8 @@ def generate(
     model="vqgan_imagenet_f16_16384"
     clip_model='ViT-B/32'
 
+    if not os.path.exists(f'{os.curdir}/models'):
+        os.makedirs(f'{os.curdir}/models')
     vqgan_config=f'{os.curdir}/models/{model}.yaml'
     if not os.path.exists(vqgan_config):
         print("model .yaml not found, downloading...")
