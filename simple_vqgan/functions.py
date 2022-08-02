@@ -258,12 +258,12 @@ def generate(
     model="vqgan_imagenet_f16_16384"
     clip_model='ViT-B/32'
 
-    vqgan_config=f'{os.curdir}/models/{os.curdir}/{model}.yaml'
+    vqgan_config=f'{os.curdir}/models/{model}.yaml'
     if not os.path.exists(vqgan_config):
         print("model .yaml not found, downloading...")
         open(vqgan_config, "wb").write(requests.get('https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/files/?p=%2Fconfigs%2Fmodel.yaml&dl=1').content)
 
-    vqgan_checkpoint=f'{os.curdir}/models/{os.curdir}/{model}.ckpt'
+    vqgan_checkpoint=f'{os.curdir}/models/{model}.ckpt'
     if not os.path.exists(vqgan_checkpoint):
         print("model .ckpt not found, downloading...")
         open(vqgan_checkpoint, "wb").write(requests.get('https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/files/?p=%2Fckpts%2Flast.ckpt&dl=1').content)
