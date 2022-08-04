@@ -5,9 +5,8 @@ import sys
 import numpy as np
 import os
 import requests
+import git
  
-sys.path.append('./taming-transformers')
-
 # Some models include transformers, others need explicit pip install
 # import transformers
 
@@ -19,6 +18,7 @@ from torch.nn import functional as F
 from torchvision import transforms
 from torchvision.transforms import functional as TF
 from tqdm import trange
+import warnings
  
 import clip
 import numpy as np
@@ -217,17 +217,18 @@ def generate(
     text_prompts,
     width=250,
     height=250,
-    save_name=None,
     iterations=100,
     save_every=10,
     save_steps=False,
+    step_size=0.15,
+    base_dir=None,
+    save_name=None,
     angle=0,
     zoom=1,
     translation_x=0,
     translation_y=0,
     seed=None,
     device='cpu',
-    step_size=0.15,
     ):
 
     if isinstance(text_prompts, str):
@@ -258,14 +259,18 @@ def generate(
     model="vqgan_imagenet_f16_16384"
     clip_model='ViT-B/32'
 
-    if not os.path.exists(f'{os.curdir}/models'):
-        os.makedirs(f'{os.curdir}/models')
-    vqgan_config=f'{os.curdir}/models/{model}.yaml'
+    if base_dir is None:
+        warnings.warn("Warning: Because you did not specify a base_dir,\nmodels and renders will be placed within the current directory.")
+        base_dir = '.'
+
+    if not os.path.exists(base_dir+'/models'):
+        os.makedirs(base_dir+'/models')
+    vqgan_config=f'{base_dir}/models/{model}.yaml'
     if not os.path.exists(vqgan_config):
         print("model .yaml not found, downloading...")
         open(vqgan_config, "wb").write(requests.get('https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/files/?p=%2Fconfigs%2Fmodel.yaml&dl=1').content)
 
-    vqgan_checkpoint=f'{os.curdir}/models/{model}.ckpt'
+    vqgan_checkpoint=f'{base_dir}/models/{model}.ckpt'
     if not os.path.exists(vqgan_checkpoint):
         print("model .ckpt not found, downloading...")
         open(vqgan_checkpoint, "wb").write(requests.get('https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/files/?p=%2Fckpts%2Flast.ckpt&dl=1').content)
@@ -309,15 +314,15 @@ def generate(
     t = trange(iterations)
     for i in t:
         if i == iterations-1:
-            if not os.path.exists(f"{os.curdir}/renders"):
-                os.makedirs(f"{os.curdir}/renders")
-            fname=f"{os.curdir}/renders/{save_name}"
+            if not os.path.exists(base_dir+'/renders'):
+                os.makedirs(base_dir+'/renders')
+            fname=base_dir+'/renders/'+save_name
         elif save_steps and (i % save_every == 0):
-            steps_dir = f"{os.curdir}/renders/steps"
+            steps_dir = base_dir+'/renders/steps'
             if not os.path.exists(steps_dir):
                 os.makedirs(steps_dir)
             fname=f"{steps_dir}/{save_name}"
         else:
             fname=None
         train(t, opt, make_cutouts, z, z_orig, z_min, z_max, model, perceptor, init_weight, pMs, fname=fname)
-    print(f"Saving final image to {fname}")
+    print(f"Saving final image as {base_dir}/renders/{fname}")

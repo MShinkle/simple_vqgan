@@ -10,3 +10,4 @@ taming-transformers
 imageio
 kornia
 clip>=1.0
+gitpython
