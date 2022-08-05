@@ -5,7 +5,6 @@ import sys
 import numpy as np
 import os
 import requests
-import git
  
 # Some models include transformers, others need explicit pip install
 # import transformers
