@@ -310,17 +310,19 @@ def generate(
         embed = perceptor.encode_text(clip.tokenize(txt).to(device)).float()
         pMs.append(Prompt(embed, weight, stop).to(device))
 
+    if not os.path.exists(base_dir+'/renders'):
+        os.makedirs(base_dir+'/renders')
+
+    if save_steps:
+        if not os.path.exists(base_dir+'/renders/steps'):
+            os.makedirs(base_dir+'/renders/steps')
+
     t = trange(iterations)
     for i in t:
         if i == iterations-1:
-            if not os.path.exists(base_dir+'/renders'):
-                os.makedirs(base_dir+'/renders')
             fname=base_dir+'/renders/'+save_name
         elif save_steps and (i % save_every == 0):
-            steps_dir = base_dir+'/renders/steps'
-            if not os.path.exists(steps_dir):
-                os.makedirs(steps_dir)
-            fname=f"{steps_dir}/{save_name}"
+            fname=f"{base_dir}/renders/steps/{save_name[:-4]}_step_{i}_.png"
         else:
             fname=None
         train(t, opt, make_cutouts, z, z_orig, z_min, z_max, model, perceptor, init_weight, pMs, fname=fname)
