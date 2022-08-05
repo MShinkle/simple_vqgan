@@ -259,7 +259,7 @@ def generate(
     clip_model='ViT-B/32'
 
     if base_dir is None:
-        warnings.warn("Warning: Because you did not specify a base_dir,\nmodels and renders will be placed within the current directory.")
+        warnings.warn("Warning: Because you did not specify a base_dir, models and renders will be placed within the current directory.")
         base_dir = '.'
 
     if not os.path.exists(base_dir+'/models'):
