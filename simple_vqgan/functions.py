@@ -325,4 +325,4 @@ def generate(
         else:
             fname=None
         train(t, opt, make_cutouts, z, z_orig, z_min, z_max, model, perceptor, init_weight, pMs, fname=fname)
-    print(f"Saving final image as renders/{fname}")
+    print(f"Saving final image as {fname}")
