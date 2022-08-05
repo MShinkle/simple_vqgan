@@ -19,21 +19,15 @@ Clone this repo, and then navigate into the cloned directory.  Then install with
 
 The package should now be installed!
 
-### Possible installation issues
+### If you want to use CUDA (gpu)
 
-A common error on fresh linux installs is missing gcc--this can be installed via apt:
-
-`sudo apt install gcc`
-
-Then call `python setup.py install` again.
-
-Also note that if you intend to use CUDA, you may need to install a version of pytorch specific to your CUDA version.
+Also note that if you intend to use a GPU, you may need to install a version of pytorch specific to your CUDA version.
 
 ##### CUDA 10.2
-conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=10.2 -c pytorch
+`conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=10.2 -c pytorch`
 
 ##### CUDA 11.3
-conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
+`conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch`
 
 CPU-only use *shouldn't* require special pytorch installation.
 
@@ -46,9 +40,13 @@ from simple_vqgan import generate
 generate('Neural Dreams')
 ```
 
-This will run and then save a generate image to [package directory]/outputs/Neural_Dreams.png
+This will run and then save a generated image.  By default, it will be named after the prompt (e.g. Neural_Dreams.png) to a directory named 'renders' in the current directory.  Both the file name and the save location can be specified with input arguments.
 
-Further input args can be used to change image size, device (CPU vs CUDA), seeds, image transformations, etc.
+You can change other aspects of the generation with other inputs.  Of note, you can change the size of the generated image by specifying `height` and `width` values. Further input args can be used to change image size, device (CPU vs CUDA), iterations, seeds, image transformations, etc.
+
+For example, to generate a 500x500-pixel image for 300 iterations using the GPU, you could run:
+
+`generate('Neural Dreams', height=500, width=500, iterations=300, device='CUDA')`
 
 
 ## Examples
