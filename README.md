@@ -3,7 +3,7 @@ A simplified version of VQGAN-CLIP for art generation.
 
 I've found existing VQGAN code to be feature-rich, but complicated for beginner use.  Also, they rarely have innate CPU support.  This is intended to be a lighter-weight but still capable variant.
 
-Currently only tested with python 3.9 on linux (Ubuntu 20), but should work on Windows and MacOS and other version of Python 3.
+Developed primarily for linux (Ubuntu 20) with python 3.9, but has been tested some on Windows and MacOS (still w/ python 3.9.)
 ## Anaconda Installation
 It is recommended that you install via the command line using Anaconda.  E.g. first create a new anaconda environment:
 
